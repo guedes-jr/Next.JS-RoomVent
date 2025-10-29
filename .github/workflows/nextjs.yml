@@ -21,22 +21,11 @@ jobs:
       - name: 📦 Checkout
         uses: actions/checkout@v4
 
-      - name: 🧩 Detect package manager
-        id: detect-package-manager
-        run: |
-          if [ -f "${{ github.workspace }}/yarn.lock" ]; then
-            echo "manager=yarn" >> $GITHUB_OUTPUT
-            echo "runner=yarn" >> $GITHUB_OUTPUT
-          else
-            echo "manager=npm" >> $GITHUB_OUTPUT
-            echo "runner=npx --no-install" >> $GITHUB_OUTPUT
-          fi
-
       - name: 🧰 Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: ${{ steps.detect-package-manager.outputs.manager }}
+          cache: "npm"
 
       - name: ⚙️ Setup Pages
         uses: actions/configure-pages@v5
@@ -51,16 +40,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-
 
-      - name: 📦 Install dependencies
+      # 👉 Instala como você fez localmente (sem usar CI)
+      # Se o lock estiver MUITO divergente, descomente a linha de "rm" para recriar o lock no CI.
+      - name: 📦 Install dependencies (legacy peer deps)
         run: |
-          if [ "${{ steps.detect-package-manager.outputs.manager }}" = "npm" ]; then
-            npm install --legacy-peer-deps
-          else
-            yarn install --frozen-lockfile
-          fi
+          # rm -f package-lock.json
+          npm install --no-audit --no-fund --legacy-peer-deps
 
       - name: 🏗️ Build with Next.js
-        run: ${{ steps.detect-package-manager.outputs.runner }} next build && ${{ steps.detect-package-manager.outputs.runner }} next export
+        run: |
+          npx --no-install next build
+          npx --no-install next export
 
       - name: 🚀 Upload artifact
         uses: actions/upload-pages-artifact@v3
