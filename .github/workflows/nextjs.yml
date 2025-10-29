@@ -26,11 +26,9 @@ jobs:
         run: |
           if [ -f "${{ github.workspace }}/yarn.lock" ]; then
             echo "manager=yarn" >> $GITHUB_OUTPUT
-            echo "command=install" >> $GITHUB_OUTPUT
             echo "runner=yarn" >> $GITHUB_OUTPUT
           else
             echo "manager=npm" >> $GITHUB_OUTPUT
-            echo "command=ci" >> $GITHUB_OUTPUT
             echo "runner=npx --no-install" >> $GITHUB_OUTPUT
           fi
 
@@ -56,7 +54,7 @@ jobs:
       - name: 📦 Install dependencies
         run: |
           if [ "${{ steps.detect-package-manager.outputs.manager }}" = "npm" ]; then
-            npm ci --legacy-peer-deps
+            npm install --legacy-peer-deps
           else
             yarn install --frozen-lockfile
           fi
