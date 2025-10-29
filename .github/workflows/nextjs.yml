@@ -40,11 +40,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-
 
+      # 👉 Instala como você fez localmente (sem usar CI)
+      # Se o lock estiver MUITO divergente, descomente a linha de "rm" para recriar o lock no CI.
       - name: 📦 Install dependencies (legacy peer deps)
-        run: npm install --no-audit --no-fund --legacy-peer-deps
+        run: |
+          # rm -f package-lock.json
+          npm install --no-audit --no-fund --legacy-peer-deps
 
-      - name: 🏗️ Build with Next.js (static export via output: export)
-        run: npx --no-install next build
+      - name: 🏗️ Build with Next.js
+        run: |
+          npx --no-install next build
+          npx --no-install next export
 
       - name: 🚀 Upload artifact
         uses: actions/upload-pages-artifact@v3
